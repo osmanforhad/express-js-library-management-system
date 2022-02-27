@@ -35,9 +35,18 @@ exports.index = function (request, response) {
   );
 };
 
-//__Display list of all Books__//
-exports.book_list = function (request, response) {
-  response.send("Not Implemented: Book List");
+// Display list of all Books.
+exports.book_list = function (req, res, next) {
+  Book.find({}, "title author")
+    .sort({ title: 1 })
+    .populate("author")
+    .exec(function (err, list_books) {
+      if (err) {
+        return next(err);
+      }
+      //Successful, so render
+      res.render("book_list", { title: "Book List", book_list: list_books });
+    });
 };
 
 //__Display Details of an specific Book//
