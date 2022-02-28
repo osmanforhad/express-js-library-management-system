@@ -16,9 +16,26 @@ exports.bookinstance_list = function (req, res, next) {
     });
 };
 
-//__Display Details of an specific BookInstance__//
-exports.bookinstance_detail = function (request, response) {
-  response.send("Not Implemented: BookInstance Details: " + request.params.id);
+//__Display detail page for a specific BookInstance__//
+exports.bookinstance_detail = function (req, res, next) {
+  BookInstance.findById(req.params.id)
+    .populate("book")
+    .exec(function (err, bookinstance) {
+      if (err) {
+        return next(err);
+      }
+      if (bookinstance == null) {
+        // No results.
+        var err = new Error("Book copy not found");
+        err.status = 404;
+        return next(err);
+      }
+      // Successful, so render.
+      res.render("bookinstance_detail", {
+        title: "Copy: " + bookinstance.book.title,
+        bookinstance: bookinstance,
+      });
+    });
 };
 
 //__Display BookInstance create From on GET__//
